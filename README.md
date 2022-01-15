@@ -14,6 +14,9 @@
   - [source 命令](#source-命令)
   - [别名 alias](#别名-alias)
   - [参考](#参考)
+- [read 命令](#read-命令)
+  - [用法](#用法)
+  - [参考](#参考-1)
 
 
 ## 10 Bash 脚本入门
@@ -236,3 +239,89 @@ usage: ex4.sh [-l] [-h] [-a somevalue]
 
 ### 参考
 https://wangdoc.com/bash/script.html
+
+## read 命令
+
+### 用法
+- [接收用户输入，存入 text](11-read-命令/ex1.sh)
+    ```bash
+    #!/usr/bin/env bash
+
+    echo -n "请输入："
+    read text
+    echo "你的输入：${text}"
+    ```
+    输出：
+    ```bash
+    ➜  11-read-命令 git:(main) ✗ ./ex1.sh
+    请输入：hello world
+    你的输入：hello world
+    ```
+- [接收多个值](./11-read-命令/ex2.sh)
+    ```bash
+    #!/usr/bin/env bash
+
+    echo -n "请输入姓名："
+    read FN LN
+    echo "hello $FN · $LN"
+    ```
+    输出：
+    ```bash
+    ➜  11-read-命令 git:(main) ✗ ./ex2.sh
+    请输入姓名：瑞峰 岳
+    hello 瑞峰 · 岳
+    ```
+- [变量数目不匹配时](./11-read-命令/ex3.sh)
+    ```bash
+    #!/usr/bin/env bash
+
+    echo -n "请输入 2 个参数："
+    read a b
+    echo "a: $a, b: $b"
+    ```
+    输出：
+    ```bash
+    ➜  11-read-命令 git:(main) ✗ ./ex3.sh
+    请输入 2 个参数：re sa
+    a: re, b: sa
+    ➜  11-read-命令 git:(main) ✗ ./ex3.sh
+    请输入 2 个参数：re sa cc nv
+    a: re, b: sa cc nv
+    ```
+    多出来的变量都赋给最后一个变量。
+- [read 之后没有变量](11-read-命令/ex4.sh)
+    ```bash
+    #!/usr/bin/env bash
+
+    echo -n "请输入："
+    read
+    echo "$REPLY"
+    ```
+    输出：
+    ```bash
+    ➜  11-read-命令 git:(main) ✗ ./ex4.sh
+    请输入：a b c d
+    a b c d
+    ```
+- [read 读取文件内容]
+    ```bash
+    #!/usr/bin/env bash
+
+    while read line
+    do
+        echo "$line"
+    done < ex5.sh
+    ```
+    输出：
+    ```bash
+    ➜  11-read-命令 git:(main) ✗ ./ex5.sh
+    #!/usr/bin/env bash
+
+    while read line
+    do
+    echo "$line"
+    ```
+    最后一行 `done < ex5.sh` 没有输出，但若是 `done < ex5.sh` 之后还有空行 `done < ex5.sh` 就会被输出。
+
+### 参考
+https://wangdoc.com/bash/read.html
