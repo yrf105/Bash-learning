@@ -25,16 +25,7 @@
   - [判断表达式](#判断表达式)
   - [算数判断](#算数判断)
   - [普通命令的逻辑运算](#普通命令的逻辑运算)
-  - [case 结构](#case-结构)
   - [参考](#参考-2)
-- [循环](#循环)
-  - [while](#while)
-  - [until](#until)
-  - [for in](#for-in)
-  - [for](#for)
-  - [break 和 continue](#break-和-continue)
-  - [select](#select)
-  - [参考](#参考-3)
 
 
 ## Bash 脚本入门
@@ -748,3 +739,108 @@ https://wangdoc.com/bash/condition.html
 
 ### 参考
 https://wangdoc.com/bash/loop.html
+
+## Bash 函数
+
+### 简介
+- 同名优先级：别名 > 函数 > 脚本
+- 语法：
+    ```bash
+    # 第一种
+    fn() {
+    # codes
+    }
+
+    # 第二种
+    function fn () { # () 加不加都可以
+    # codes
+    }
+    ```
+    示例：
+    ```bash
+    ➜  shell-learning git:(main) ✗ hello() {
+    function> echo "Hello $1"
+    function> }
+    ➜  shell-learning git:(main) ✗ hello world
+    Hello world
+    ```
+- `unset -f functionName` 删除已定义函数。
+    示例：
+    ```bash
+    ➜  shell-learning git:(main) ✗ unset -f hello
+    ➜  shell-learning git:(main) ✗ hello world
+    zsh: command not found: hello
+    ```
+
+- `declare -f` 查看所有已定义的函数。
+- `declare -f functionName` 单独查看指定函数。
+
+### 参数变量
+- 函数的参数变量，与脚本[脚本参数](#脚本参数)是一致的。
+    [示例](13-函数/para.sh)：
+    ```bash
+    #!/usr/bin/env bash
+
+    function alice () {
+        echo "alice: $@"
+        echo "$0: $1 $2 $3 $4"
+        echo "$# 个参数"
+    }
+
+    alice in wonderland # 这就是个函数调用，函数名为 alice，参数分别为 in 和 wonderland
+    ```
+    执行：
+    ```bash
+    ➜  13-函数 git:(main) ✗ ./para.sh
+    alice: in wonderland
+    ./para.sh: in wonderland
+    2 个参数
+    ```
+- 日志函数示例：
+    ```bash
+    ➜  13-函数 git:(main) ✗ function log {
+    echo "[ `date '+ %F %T'` ]: $@"
+    }
+    ➜  13-函数 git:(main) ✗ log 123
+    [  2022-01-16 16:50:54 ]: 123
+    ```
+
+### return 命令
+- 基本同 C。
+- 如果命令行直接执行函数，下一个命令可以用 `$?` 拿到返回值。
+
+### 全局变量和局部变量
+- [Bash 函数体内可以声明，读取，修改全局变量](13-函数/globalandlocal.sh)。
+- [Bash 函数体内声明局部变量需显式使用 `local` 命令](13-函数/globalandlocal.sh)。
+```bash
+#!/usr/bin/env bash
+
+foo() {
+    bar=1
+    echo "bar=$bar"
+}
+
+foo
+
+echo "bar=$bar"
+
+widget() {
+    local w=5
+    echo "w=$w"
+}
+
+widget
+
+echo "w=$w"
+```
+执行：
+```bash
+➜  13-函数 git:(main) ✗ ./globalandlocal.sh
+bar=1
+bar=1
+w=5
+w=
+```
+
+### 参考
+https://wangdoc.com/bash/function.html
