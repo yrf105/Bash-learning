@@ -25,7 +25,22 @@
   - [判断表达式](#判断表达式)
   - [算数判断](#算数判断)
   - [普通命令的逻辑运算](#普通命令的逻辑运算)
+  - [case 结构](#case-结构)
   - [参考](#参考-2)
+- [循环](#循环)
+  - [while](#while)
+  - [until](#until)
+  - [for in](#for-in)
+  - [for](#for)
+  - [break 和 continue](#break-和-continue)
+  - [select](#select)
+  - [参考](#参考-3)
+- [函数](#函数)
+  - [简介](#简介)
+  - [参数变量](#参数变量)
+  - [return 命令](#return-命令)
+  - [全局变量和局部变量](#全局变量和局部变量)
+  - [参考](#参考-4)
 
 
 ## Bash 脚本入门
@@ -740,7 +755,8 @@ https://wangdoc.com/bash/condition.html
 ### 参考
 https://wangdoc.com/bash/loop.html
 
-## Bash 函数
+
+## 函数
 
 ### 简介
 - 同名优先级：别名 > 函数 > 脚本
@@ -776,7 +792,7 @@ https://wangdoc.com/bash/loop.html
 - `declare -f functionName` 单独查看指定函数。
 
 ### 参数变量
-- 函数的参数变量，与脚本[脚本参数](#脚本参数)是一致的。
+- 函数的参数变量，与脚本参数是一致的。
     [示例](13-函数/para.sh)：
     ```bash
     #!/usr/bin/env bash
@@ -812,35 +828,35 @@ https://wangdoc.com/bash/loop.html
 ### 全局变量和局部变量
 - [Bash 函数体内可以声明，读取，修改全局变量](13-函数/globalandlocal.sh)。
 - [Bash 函数体内声明局部变量需显式使用 `local` 命令](13-函数/globalandlocal.sh)。
-```bash
-#!/usr/bin/env bash
+    ```bash
+    #!/usr/bin/env bash
 
-foo() {
-    bar=1
+    foo() {
+        bar=1
+        echo "bar=$bar"
+    }
+
+    foo
+
     echo "bar=$bar"
-}
 
-foo
+    widget() {
+        local w=5
+        echo "w=$w"
+    }
 
-echo "bar=$bar"
+    widget
 
-widget() {
-    local w=5
     echo "w=$w"
-}
-
-widget
-
-echo "w=$w"
-```
-执行：
-```bash
-➜  13-函数 git:(main) ✗ ./globalandlocal.sh
-bar=1
-bar=1
-w=5
-w=
-```
+    ```
+    执行：
+    ```bash
+    ➜  13-函数 git:(main) ✗ ./globalandlocal.sh
+    bar=1
+    bar=1
+    w=5
+    w=
+    ```
 
 ### 参考
 https://wangdoc.com/bash/function.html
