@@ -41,6 +41,20 @@
   - [return 命令](#return-命令)
   - [全局变量和局部变量](#全局变量和局部变量)
   - [参考](#参考-4)
+- [数组](#数组)
+  - [创建数组](#创建数组)
+  - [读取数组](#读取数组)
+    - [读取单个元素](#读取单个元素)
+    - [读取所有成员](#读取所有成员)
+    - [拷贝数组](#拷贝数组)
+    - [追加元素](#追加元素)
+  - [数组长度](#数组长度)
+  - [提取数组序号](#提取数组序号)
+  - [提取数组成员](#提取数组成员)
+  - [追加数组成员](#追加数组成员)
+  - [删除数组](#删除数组)
+  - [关联数组](#关联数组)
+  - [参考](#参考-5)
 
 
 ## Bash 脚本入门
@@ -860,3 +874,162 @@ https://wangdoc.com/bash/loop.html
 
 ### 参考
 https://wangdoc.com/bash/function.html
+
+## 数组
+
+### 创建数组
+- [示例](14-array/create.sh)：
+    ```bash
+    #!/usr/bin/env bash
+
+    # 采用逐个赋值的方式创建有三个元素的数组
+    array[0]=1
+    array[1]=2
+    array[3]=3
+    echo "${array[@]}" # 1 2 3
+
+    # 采用一次性赋值的方式创建有三个元素的数组
+    ARRAY=(1 2 3)
+    echo "${ARRAY[@]}" # 1 2 3
+    ARRAY=(
+        1
+        2
+        3
+    )
+    echo "${ARRAY[@]}" # 1 2 3
+
+    # 指定元素位置
+    ARRAY=([2]=a [1]=b [0]=c)
+    echo "${ARRAY[@]}" # c b a
+
+    # 没有赋值的数组元素的默认值是空字符串。
+    ARRAY=(a [4]=hello)
+    echo "${ARRAY[@]}" # a hello
+
+    # 使用通配符，将当前文件夹下所有以 .sh 结尾的文件放入 shs 数组
+    shs=(*.sh)
+    echo "${shs[@]}" # create.sh
+
+    # 使用 declare 声明数组
+    declare -a ARRAY
+    ```
+
+### [读取数组](./14-array/read.sh)
+
+#### 读取单个元素
+    ```bash
+    array[0]=a
+    # 加大括号
+    echo ${array[0]} # a
+    # 不加大括号，默认读取 0 位置的元素
+    echo $array[0] # a[0]
+    ```
+
+#### 读取所有成员
+    ```bash
+    # @ 和 * 是数组的特殊索引，表示返回数组的所有成员。
+    foo=(a b c d e f)
+    echo "${foo[@]}" # a b c d e f
+    echo "${foo[*]}" # a b c d e f
+
+    # 配合 for 循环遍历数组
+    for i in "${foo[@]}"; do
+        echo -n "$i,"
+    done
+    echo
+    # a,b,c,d,e,f,
+
+    bar=("hello world" "yue rui feng" xi dian tyut)
+    # ${bar[@]} 是否放在 "" 中存在区别
+    for i in ${bar[@]}; do
+        echo $i
+    done
+    # hello
+    # world
+    # yue
+    # rui
+    # feng
+    # xi
+    # dian
+    # tyut
+
+    for i in "${bar[@]}"; do
+        echo $i
+    done
+    # hello world
+    # yue rui feng
+    # xi
+    # dian
+    # tyut
+
+    # ${bar[*]} 不放在 "" 中的效果同 ${bar[@]}
+
+    # ${bar[*]} 放在 "" 中
+    for i in "${bar[*]}"; do
+        echo $i
+    done
+    # hello world yue rui feng xi dian tyut
+    ```
+
+#### 拷贝数组
+    ```bash
+    barCopy=( "${bar[@]}" )
+    echo "${barCopy[@]}" # hello world yue rui feng xi dian tyut
+    ```
+
+#### 追加元素
+    ```bash
+    barAppend=( "${bar[@]}" 321)
+    echo "${barAppend[@]}" # hello world yue rui feng xi dian tyut 321
+    ```
+
+### 数组长度
+    ```bash
+    ${#array[*]}
+    ${#array[@]}
+    ```
+
+### 提取数组序号
+- 返回数组中存在元素的位置的下标
+    ```bash
+    ${!array[@]}
+    ${!array[*]}
+    ```
+
+### 提取数组成员
+    ```bash
+    ${array[@]:position:length} # 返回从位置 position 开始的 length 个元素
+    ${array[@]:position} # 返回重位置 position 开始的所有元素
+    ```
+
+### 追加数组成员
+- 使用 `+=` 向数组末尾追加成员
+    ```bash
+    $ foo=(a b c)
+    $ echo ${foo[@]}
+    a b c
+
+    $ foo+=(d e f)
+    $ echo ${foo[@]}
+    a b c d e f
+    ```
+
+### 删除数组
+- 使用 `unset` 删除元素
+    ```bash
+    unset foo[1] # 删除指定元素
+    unset foo # 删除整个数组
+    ```
+
+### 关联数组
+- 关联数组可以看做下标为字符串的数组
+- 使用关联数组前必须使用 `declare -A` 声明
+    ```bash
+    declare -A colors
+    colors["red"]="#ff0000"
+    colors["green"]="#00ff00"
+    colors["blue"]="#0000ff"
+    ```
+
+### 参考
+https://wangdoc.com/bash/array.html
