@@ -22,7 +22,19 @@
 - [条件判断](#条件判断)
   - [if 结构](#if-结构)
   - [test 命令](#test-命令)
+  - [判断表达式](#判断表达式)
+  - [算数判断](#算数判断)
+  - [普通命令的逻辑运算](#普通命令的逻辑运算)
+  - [case 结构](#case-结构)
   - [参考](#参考-2)
+- [循环](#循环)
+  - [while](#while)
+  - [until](#until)
+  - [for in](#for-in)
+  - [for](#for)
+  - [break 和 continue](#break-和-continue)
+  - [select](#select)
+  - [参考](#参考-3)
 
 
 ## Bash 脚本入门
@@ -486,6 +498,253 @@ https://wangdoc.com/bash/read.html
     /etc/passwd 存在
     ```
 
+### 判断表达式
+- if 后跟的是一个或多个命令，命令返回 0 时代表成立，否则代表不成立。命令可以是 `test` 命令，也可以是其他命令。
+- 文件判断
+  - `[ -a file ]`：如果 file 存在，则为 true。
+  - `[ -b file ]`：如果 file 存在并且是一个块（设备）文件，则为 true。
+  - `[ -c file ]`：如果 file 存在并且是一个字符（设备）文件，则为 true。
+  - `[ -d file ]`：如果 file 存在并且是一个目录，则为 true。
+  - `[ -e file ]`：如果 file 存在，则为 true。
+  - `[ -f file ]`：如果 file 存在并且是一个普通文件，则为 true。
+  - `[ -g file ]`：如果 file 存在并且设置了组 ID，则为 true。
+  - `[ -G file ]`：如果 file 存在并且属于有效的组 ID，则为 true。
+  - `[ -h file ]`：如果 file 存在并且是符号链接，则为 true。
+  - `[ -k file ]`：如果 file 存在并且设置了它的 “[sticky bit](https://zh.wikipedia.org/zh-hans/%E9%BB%8F%E6%BB%9E%E4%BD%8D)”，则为 true。
+  - `[ -L file ]`：如果 file 存在并且是一个符号链接，则为 true。
+  - `[ -N file ]`：如果 file 存在并且自上次读取后已被修改，则为 true。
+  - `[ -O file ]`：如果 file 存在并且属于有效的用户 ID，则为 true。
+  - `[ -p file ]`：如果 file 存在并且是一个命名管道，则为 true。
+  - `[ -r file ]`：如果 file 存在并且可读（当前用户有可读权限），则为 true。
+  - `[ -s file ]`：如果 file 存在且其长度大于零，则为 true。
+  - `[ -S file ]`：如果 file 存在且是一个网络 socket，则为 true。
+  - `[ -t fd ]`：如果 fd 是一个文件描述符，并且重定向到终端，则为 true。 这可以用来判断是否重定向了标准输入／输出／错误。
+  - `[ -u file ]`：如果 file 存在并且设置了 setuid 位，则为 true。
+  - `[ -w file ]`：如果 file 存在并且可写（当前用户拥有可写权限），则为 true。
+  - `[ -x file ]`：如果 file 存在并且可执行（有效用户有执行／搜索权限），则为 true。
+  - `[ file1 -nt file2 ]`：如果 FILE1 比 FILE2 的更新时间最近，或者 FILE1 存在而 FILE2 不存在，则为 true。
+  - `[ file1 -ot file2 ]`：如果 FILE1 比 FILE2 的更新时间更旧，或者 FILE2 存在而 FILE1 不存在，则为 true。
+  - `[ FILE1 -ef FILE2 ]`：如果 FILE1 和 FILE2 引用相同的设备和 inode 编号，则为 true。
+
+    示例：
+    ```bash
+    #!/usr/bin/env bash
+
+    FILE="./file.sh"
+
+    if [ -e "$FILE" ]; then # 这里的 $FILE 必须被「双引号」包围
+        echo "$FILE 文件存在"
+    fi
+    ```
+    执行：
+    ```bash
+    ➜  12-if-结构 git:(main) ✗ ./file.sh
+    ./file.sh 文件存在
+    ```
+- 字符串判断
+    - `[ string ]`：如果 string 不为空（长度大于 0），则判断为真。
+    - `[ -n string ]`：如果字符串 string 的长度大于零，则判断为真。
+    - `[ -z string ]`：如果字符串 string 的长度为零，则判断为真。
+    - `[ string1 = string2 ]`：如果 string1 和 string2 相同，则判断为真。
+    - `[ string1 == string2 ]` 等同于 `[ string1 = string2 ]`。
+    - `[ string1 != string2 ]`：如果 string1 和 string2 不相同，则判断为真。
+    - `[ string1 '>' string2 ]`：如果按照字典顺序 string1 排列在 string 之后，则判断为真。
+    - `[ string1 '<' string2 ]`：如果按照字典顺序 string1 排列在 string2 之前，则判断为真。
+
+    注意，`test` 命令内部的 `>` 和 `<`，必须用引号引起来（或者是用反斜杠转义）。否则，它们会被 shell 解释为重定向操作符。
+
+- 整数判断
+    - `[ integer1 -eq integer2 ]`：如果 integer1 等于 integer2，则为 true。
+    - `[ integer1 -ne integer2 ]`：如果 integer1 不等于 integer2，则为 true。
+    - `[ integer1 -le integer2 ]`：如果 integer1 小于或等于 integer2，则为 true。
+    - `[ integer1 -lt integer2 ]`：如果 integer1 小于 integer2，则为 true。
+    - `[ integer1 -ge integer2 ]`：如果 integer1 大于或等于 integer2，则为 true。
+    - `[ integer1 -gt integer2 ]`：如果 integer1 大于 integer2，则为 true。
+
+- 正则判断
+    - [[ expression ]]这种判断形式，支持正则表达式。
+      例如：`[[ string1 =~ regex ]]`，`=~` 是正则比较运算符。
+
+- `test` 判断的逻辑运算
+    - `AND` 运算：符号 `&&`，也可使用参数 `-a`。
+    - `OR` 运算：符号 `||`，也可使用参数 `-o`。
+    - `NOT` 运算：符号 `!`。
+
+    [判断整数是否在某个范围内](12-if-结构/file_digit.sh)：
+    ```bash
+    #!/usr/bin/env bash
+
+    MAX_VALUE=100
+    MIN_VALUE=1
+
+    NUM=50
+
+    if [[ "$NUM" =~ ^-?[0-9]+$ ]]; then
+        if [[ $NUM -le $MAX_VALUE && $NUM -ge $MIN_VALUE ]]; then # 这里必须是 [[ xx ]] 不能是 [ xx ]
+            echo "$NUM 在范围内"
+        else
+            echo "$NUM 不在范围内"
+        fi
+    else
+        echo "$NUM 不是整数"
+    fi
+    ```
+    执行：
+    ```bash
+    ➜  12-if-结构 git:(main) ✗ ./file_digit.sh
+    50 在范围内
+    ```
+
+### 算数判断
+- 使用 `(())` 进行算数判断：
+    ```bash
+    if ((3 > 2)); then
+        echo "true"
+    fi
+    ```
+    如果算术计算的结果是非零值，则表示判断成立。这一点跟命令的返回值正好相反，需要小心。
+
+### 普通命令的逻辑运算
+- ```bash
+  $ command1 && command2 # 先执行 command1，只有 command1 执行成功后， 才会执行 command2
+  $ command1 || command2 # 先执行 command1，只有 command1 执行失败后， 才会执行 command2
+  ```
+
+
+### case 结构
+- 语法
+    ```bash
+    case expression in
+        pattern )
+            commands ;;
+        pattern )
+            commands ;;
+        ...
+    esac
+    ```
+- 使用 `case` 判断当前操作系统类型
+    ```bash
+    #!/usr/bin/env bash
+
+    OS=$(uname -s)
+
+    case "$OS" in
+        FreeBSD )
+            echo "This is FreeBSD" ;;
+        Linux )
+            echo "This is Linux" ;;
+        * )
+            echo "不知道是啥系统" ;;
+    esac
+    ```
+    执行：
+    ```bash
+    ➜  12-if-结构 git:(main) ✗ ./case.sh
+    This is Linux
+    ```
+- `case` 模式中可用的通配模式
+    - `a)`：匹配 a。
+    - `a|b)`：匹配 a 或 b。
+    - `[[:alpha:]])`：匹配单个字母。
+    - `???)`：匹配 3 个字符的单词。
+    - `*.txt)`：匹配 .txt 结尾。
+    - `*)`：匹配任意输入，通常作为 case 结构的最后一个模式。
+- Bash 4.0 之后，允许匹配多个条件，这时可以用 `;;&` 终止每个条件块。
 
 ### 参考
 https://wangdoc.com/bash/condition.html
+
+## 循环
+
+### while
+- 语法：
+    ```bash
+    while condition; do
+        commands
+    done
+    ```
+    其中 condition 与 if 中的 condition 用法和注意点相同。
+
+### until
+- 语法：
+    ```bash
+    until condition; do
+        commands
+    done
+    ```
+    与 `while` 正好相反，只要条件`不成立`，就一直循环下去。
+
+### for in
+- 遍历链表中的每一项。
+- 语法：
+    ```bash
+    for variable in list; do
+        commands
+    done
+    ```
+
+### for
+- C 语言版的 for 循环。
+- 语法：
+    ```bash
+    for (( expression1; expression2; expression3 )); do
+        commands
+    done
+    ```
+- `(())` 中访问变量不必加 `$`:
+    ```bash
+    for (( i=0; i<5; i=i+1 )); do
+        echo $i
+    done
+    ```
+
+### break 和 continue
+- 同 C。
+
+### select
+- 生成简单的菜单。
+- 语法：
+    ```bash
+    select name
+    [in list]
+    do
+        commands
+    done
+    ```
+- [示例](12-循环/select.sh)：
+    ```bash
+    #!/usr/bin/env bash
+
+    echo "你最喜欢的操作系统是？"
+
+    select os in Arch Ubuntu Win10 MacOS
+    do
+        case $os in
+            "Arch" | "Ubuntu" | "Win10")
+                echo "i also like $os" ;;
+            "MacOS" )
+                echo "我买不起 Mac" ;;
+            * )
+                echo "我没听说过 $os" ;;
+        esac
+    done
+    ```
+    执行：
+    ```bash
+    ➜  12-循环 git:(main) ✗ ./select.sh
+    你最喜欢的操作系统是？
+    1) Arch
+    2) Ubuntu
+    3) Win10
+    4) MacOS
+    #? 1
+    i also like Arch
+    #? 4
+    我买不起 Mac
+    #? w
+    我没听说过
+    #? ^C
+    ```
+
+### 参考
+https://wangdoc.com/bash/loop.html
