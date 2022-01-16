@@ -1,5 +1,5 @@
 
-- [10 Bash 脚本入门](#10-bash-脚本入门)
+- [Bash 脚本入门](#bash-脚本入门)
   - [Shebang 行](#shebang-行)
   - [执行权限和路径](#执行权限和路径)
   - [env 命令](#env-命令)
@@ -16,10 +16,12 @@
   - [参考](#参考)
 - [read 命令](#read-命令)
   - [用法](#用法)
+  - [参数](#参数)
+  - [IFS (Internal Field Separator，内部字段分隔符)](#ifs-internal-field-separator内部字段分隔符)
   - [参考](#参考-1)
 
 
-## 10 Bash 脚本入门
+## Bash 脚本入门
 
 ### Shebang 行
 bash 脚本的第一行称为 Shebang 行
@@ -322,6 +324,105 @@ https://wangdoc.com/bash/script.html
     echo "$line"
     ```
     最后一行 `done < ex5.sh` 没有输出，但若是 `done < ex5.sh` 之后还有空行 `done < ex5.sh` 就会被输出。
+
+### 参数
+- [`-t` 设置等待输入的超时时间](11-read-命令/ex6.sh)
+    ```bash
+    #!/usr/bin/env bash
+
+    # 等待 3 秒
+    if read -t 3 text; then
+        echo "用户输入：$text"
+    else
+    echo '用户没有输出'
+    fi
+    ```
+    执行：
+    ```bash
+    ➜  11-read-命令 git:(main) ✗ ./ex6.sh
+    ./ex6.sh: line 3: read: text: invalid timeout specification
+    用户没有输出
+    ➜  11-read-命令 git:(main) ✗ ./ex6.sh
+    32
+    用户输入：32
+    ```
+- [`-p` 指定输入的提示信息]
+    ```bash
+    #!/usr/bin/env bash
+
+    read -p "请输入：" text
+    echo $text
+    ```
+    执行：
+    ```bash
+    ➜  11-read-命令 git:(main) ✗ ./ex7.sh
+    请输入：2
+    2
+    ```
+- [`-a` 将用户输入赋值给一个数组](11-read-命令/ex8.sh)
+    ```bash
+    #!/usr/bin/env bash
+
+    read -a array
+    echo ${array[0]}
+    echo ${array[1]}
+    ```
+    输出：
+    ```bash
+    ➜  11-read-命令 git:(main) ✗ ./ex8.sh
+    yue rui feng
+    yue
+    rui
+    ```
+- `-n` 指定读取字符个数
+- `-e` 允许用户输入的时候，使用 readline 库提供的快捷键，比如自动补全
+- `-d` delimiter：定义字符串 delimiter 的第一个字符作为用户输入的结束，而不是一个换行符
+- `-r` raw 模式，表示不把用户输入的反斜杠字符解释为转义字符
+- `-s` 使得用户的输入不显示在屏幕上，这常常用于输入密码或保密信息
+- `-u` fd：使用文件描述符 fd 作为输入
+
+### IFS (Internal Field Separator，内部字段分隔符)
+- IFS 默认为「空格，Tab，换行」
+- [IFS 的赋值命令与 read 写在一行，则在 read 执行结束后 IFS 自动回复为旧值](11-read-命令/ex9.sh)
+    ```bash
+    #!/usr/bin/env bash
+
+    passwd=/etc/passwd
+    read -p "用户名：" username
+
+    userinfo="$(grep "^$username" $passwd)"
+
+    if [ -n "$userinfo" ]; then
+        IFS=":" read user pw uid gid name home shell <<< "$userinfo"
+        echo "user: $user"
+        echo "pw: $pw"
+        echo "uid: $uid"
+        echo "gid: $gid"
+        echo "name: $name"
+        echo "home: $home"
+        echo "shell: $shell"
+    else
+        echo "no such user: $username" >&2
+        exit 1
+    fi
+    ```
+    `<<<` 的意思是将后面的变量值转化为标准输入，因为 read 只能读取标准输入。
+    
+    执行：
+    ```bash
+    ➜  11-read-命令 git:(main) ✗ ./ex9.sh
+    用户名：wddxrw
+    user: wddxrw
+    pw: x
+    uid: 1000
+    gid: 1000
+    name: ,,,
+    home: /home/wddxrw
+    shell: /usr/bin/zsh
+    ➜  11-read-命令 git:(main) ✗ ./ex9.sh
+    用户名：xxx
+    no such user: xxx
+    ```
 
 ### 参考
 https://wangdoc.com/bash/read.html
