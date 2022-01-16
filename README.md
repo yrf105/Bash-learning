@@ -19,6 +19,10 @@
   - [参数](#参数)
   - [IFS (Internal Field Separator，内部字段分隔符)](#ifs-internal-field-separator内部字段分隔符)
   - [参考](#参考-1)
+- [条件判断](#条件判断)
+  - [if 结构](#if-结构)
+  - [test 命令](#test-命令)
+  - [参考](#参考-2)
 
 
 ## Bash 脚本入门
@@ -407,7 +411,7 @@ https://wangdoc.com/bash/script.html
     fi
     ```
     `<<<` 的意思是将后面的变量值转化为标准输入，因为 read 只能读取标准输入。
-    
+
     执行：
     ```bash
     ➜  11-read-命令 git:(main) ✗ ./ex9.sh
@@ -426,3 +430,62 @@ https://wangdoc.com/bash/script.html
 
 ### 参考
 https://wangdoc.com/bash/read.html
+
+
+## 条件判断
+
+### if 结构
+- 语法
+    ```bash
+    if commands; then
+        commands
+    [elif commands; then
+        commands...]
+    [else
+        commands]
+    fi
+    ```
+- if 后可跟若干条命令，所有命令都会执行，只有最后一条命令的成功与否（是否返回 0），会决定 then 是否会执行。
+    ```bash
+    ➜  12-if-结构 git:(main) ✗  if false; false; true; then echo "hello"; else echo "world"; fi;
+    hello
+    ➜  12-if-结构 git:(main) ✗  if false; true; false; then echo "hello"; else echo "world"; fi;
+    world
+    ➜  12-if-结构 git:(main) ✗  false
+    ➜  12-if-结构 git:(main) ✗  echo $?
+    1
+    ➜  12-if-结构 git:(main) ✗  true
+    ➜  12-if-结构 git:(main) ✗  echo $?
+    0
+    ```
+
+### test 命令
+- if 的判断条件一般使用 test 命令
+- test 命令的三种写法
+    ```bash
+    #!/usr/bin/env bash
+
+    if test -e /tmp/abc
+    then
+        echo "/tmp/abc 存在"
+    fi
+
+    if [ -e /etc/hosts ]; then
+        echo "/etc/hosts 存在"
+    fi
+
+    if [[ -e /etc/passwd ]]; then
+        echo "/etc/passwd 存在"
+    fi
+    ```
+    [[]] 中的表达式支持正则。
+    执行：
+    ```bash
+    ➜  12-if-结构 git:(main) ✗ ./test.sh
+    /etc/hosts 存在
+    /etc/passwd 存在
+    ```
+
+
+### 参考
+https://wangdoc.com/bash/condition.html
