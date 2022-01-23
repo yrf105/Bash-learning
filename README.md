@@ -1,4 +1,36 @@
-
+- [Bash 简介](#bash-简介)
+  - [Shell 的含义](#shell-的含义)
+  - [Shell 的种类](#shell-的种类)
+  - [命令行环境](#命令行环境)
+    - [终端模拟器](#终端模拟器)
+    - [命令行提示符](#命令行提示符)
+    - [进入和退出方法](#进入和退出方法)
+    - [查看 Shell 版本](#查看-shell-版本)
+- [Bash 基本语法](#bash-基本语法)
+  - [echo 命令](#echo-命令)
+  - [命令格式](#命令格式)
+  - [空格](#空格)
+  - [分号](#分号)
+  - [命令组合符 `&&` 和 `||`](#命令组合符--和-)
+  - [`type` 命令](#type-命令)
+  - [快捷键](#快捷键)
+- [Bash 模式扩展](#bash-模式扩展)
+  - [简介](#简介)
+  - [`~` 波浪线扩展](#-波浪线扩展)
+  - [`?` 字符扩展](#-字符扩展)
+  - [`*` 字符扩展](#-字符扩展-1)
+  - [`[]` 方括号扩展](#-方括号扩展)
+  - [`[start-end]` 扩展](#start-end-扩展)
+  - [`{}` 大括号扩展](#-大括号扩展)
+  - [`{start-end}` 扩展](#start-end-扩展-1)
+  - [变量扩展](#变量扩展)
+  - [子命令扩展](#子命令扩展)
+  - [算术扩展](#算术扩展)
+  - [字符类](#字符类)
+  - [注意](#注意)
+  - [量词语法](#量词语法)
+  - [shopt 命令](#shopt-命令)
+  - [参考](#参考)
 - [Bash 脚本入门](#bash-脚本入门)
   - [Shebang 行](#shebang-行)
   - [执行权限和路径](#执行权限和路径)
@@ -13,12 +45,12 @@
   - [命令执行结果](#命令执行结果)
   - [source 命令](#source-命令)
   - [别名 alias](#别名-alias)
-  - [参考](#参考)
+  - [参考](#参考-1)
 - [read 命令](#read-命令)
   - [用法](#用法)
   - [参数](#参数)
   - [IFS (Internal Field Separator，内部字段分隔符)](#ifs-internal-field-separator内部字段分隔符)
-  - [参考](#参考-1)
+  - [参考](#参考-2)
 - [条件判断](#条件判断)
   - [if 结构](#if-结构)
   - [test 命令](#test-命令)
@@ -26,7 +58,7 @@
   - [算数判断](#算数判断)
   - [普通命令的逻辑运算](#普通命令的逻辑运算)
   - [case 结构](#case-结构)
-  - [参考](#参考-2)
+  - [参考](#参考-3)
 - [循环](#循环)
   - [while](#while)
   - [until](#until)
@@ -34,13 +66,13 @@
   - [for](#for)
   - [break 和 continue](#break-和-continue)
   - [select](#select)
-  - [参考](#参考-3)
+  - [参考](#参考-4)
 - [函数](#函数)
-  - [简介](#简介)
+  - [简介](#简介-1)
   - [参数变量](#参数变量)
   - [return 命令](#return-命令)
   - [全局变量和局部变量](#全局变量和局部变量)
-  - [参考](#参考-4)
+  - [参考](#参考-5)
 - [数组](#数组)
   - [创建数组](#创建数组)
   - [读取数组](#读取数组)
@@ -54,7 +86,461 @@
   - [追加数组成员](#追加数组成员)
   - [删除数组](#删除数组)
   - [关联数组](#关联数组)
-  - [参考](#参考-5)
+  - [参考](#参考-6)
+
+
+## Bash 简介
+
+Bash 是绝大多数 Linux 发行版的默认 Shell。
+
+### Shell 的含义
+
+- Shell 是一个程序，为用户提供一个与操作系统对话的命令行环境
+- Shell 是一个命令解释器，可以写 Shell 脚本给 Shell 解释执行
+- Shell 是一个工具箱，提供了各种方便的小工具
+
+### Shell 的种类
+
+Bourne Shell（sh）、Bourne Again shell（bash）、C Shell（csh）、TENEX C Shell（tcsh）、Korn shell（ksh）、Z Shell（zsh）、Friendly Interactive Shell（fish）。其中 Bash 最常用
+
+- 查看当前运行的 Shell
+
+  ```shell
+  $ echo $SHELL
+  /usr/bin/zsh
+  ```
+
+- 查看当前系统安装的所有 Shell
+
+  ```shell
+  $ cat /etc/shells
+  # /etc/shells: valid login shells
+  /bin/sh
+  /bin/bash
+  /usr/bin/bash
+  /bin/rbash
+  /usr/bin/rbash
+  /bin/dash
+  /usr/bin/dash
+  /usr/bin/tmux
+  /usr/bin/screen
+  /bin/zsh
+  /usr/bin/zsh
+  ```
+
+### 命令行环境
+
+#### 终端模拟器
+
+终端模拟器（terminal emulator）是一个模拟命令行的窗口程序，可以让用户在图形环境中进入命令行环境，使用 Shell
+
+#### 命令行提示符
+
+```shell
+[user@hostname] $
+```
+
+root 用户不是 `$` 而是 `#`
+
+#### 进入和退出方法
+
+- 启动 Bash
+
+  ```shell
+  $ bash
+  ```
+
+- 退出 Bash
+
+  ```shell
+  $ exit
+  ```
+
+  或者 Ctrl + d
+
+
+#### 查看 Shell 版本
+
+```shell
+➜  ~ bash --version
+GNU bash, version 5.0.17(1)-release (x86_64-pc-linux-gnu)
+Copyright (C) 2019 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+
+This is free software; you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+
+➜  ~ zsh --version
+zsh 5.8 (x86_64-ubuntu-linux-gnu)
+```
+
+## Bash 基本语法
+
+### echo 命令
+
+- 输出单行文本
+
+  ```shell
+  ➜  ~ echo hello world
+  hello world
+  ```
+
+- 输出多行文本，需要 `“”`
+
+  ```shell
+  ➜  ~ echo "<html>
+  dquote> </html>
+  dquote> "
+  <html>
+  </html>
+  ```
+
+- `-n` 取消末尾默认的回车符
+
+  ```shell
+  ➜  ~ echo -n hello
+  hello%
+  ```
+
+- `-e` 解释引号（单引号或者双引号）里的特殊字符（例如 `\n`）
+
+  ```shell
+  $ echo "hello\nworld"
+  hello\nworld
+  $ echo 'hello\nworld'
+  hello\nworld
+  $ echo -e "hello\nworld"
+  hello
+  world
+  $ echo -e 'hello\nworld'
+  hello
+  world
+  ```
+
+### 命令格式
+
+- ```shell
+  $ command [ arg1 ... [ argN ]]
+  ```
+
+  - command 为具体的命令
+  - arg1 ... argN 传递给命令的可选参数
+- 以 `-` 开头的参数是命令的配置项，配置项分为短形式和长形式
+
+  ```shell
+  # 短形式 便于手动输入
+  $ ls -r
+
+  # 长形式 便于命令自解释 常用于脚本
+  $ ls --reverse
+  ```
+
+- `\` 将命令分为多行
+
+  ```shell
+  $ echo foo bar
+  foo bar
+  $ echo foo \
+  > bar
+  foo bar
+  ```
+
+### 空格
+
+- Bash 使用空格（或 Tab）分隔不同参数
+
+  ```shell
+  $ command foo bar
+  ```
+
+- Bash 会自动忽略多余的空格
+
+  ```shell
+  $ echo hello       world
+  hello world
+  ```
+
+### 分号
+
+- `;` 是命令结束符，使得一行可以放置多行命令，命令按序执行，不论上一个命令成功或失败，当前命令总是会执行
+
+  ```shell
+  $ clear; ls
+  ```
+
+### 命令组合符 `&&` 和 `||`
+
+-
+  ```shell
+  # 若 Command1 执行成功，则继续执行 Command2
+  Command1 && Command2
+
+  # 若 Command1 执行失败，则继续执行 Command2
+  Command1 || Command2
+  ```
+
+### `type` 命令
+
+- `type` 命令用来判断命令的来源（内置命令 or 外部程序）
+
+  ```shell
+  $ type echo
+  echo is a shell builtin
+  $ type ls
+  ls is aliased to `ls --color=auto'
+  ```
+
+- `-a` 查看命令的所有定义
+
+  ```shell
+  $ type -a ls
+  ls is aliased to `ls --color=auto'
+  ls is /usr/bin/ls
+  ls is /bin/ls
+  $ type -a echo
+  echo is a shell builtin
+  echo is /usr/bin/echo
+  echo is /bin/echo
+  ```
+
+- `-t` 查看命令的类型：别名（alias），关键词（keyword），函数（function），内置命令（builtin）和文件（file）
+
+  ```shell
+  $ type -t ls
+  alias
+  $ type -t type
+  builtin
+  ```
+
+### 快捷键
+
+- `Ctrl + L`：清除屏幕并将当前行移到页面顶部。
+- `Ctrl + C`：中止当前正在执行的命令。
+- `Shift + PageUp`：向上滚动。
+- `Shift + PageDown`：向下滚动。
+- `Ctrl + U`：从光标位置删除到行首。
+- `Ctrl + K`：从光标位置删除到行尾。
+- `Ctrl + D`：关闭 Shell 会话。
+- `↑`，`↓`：浏览已执行命令的历史记录。
+- `Tab`：自动补全，两次 `Tab` 显示自动补全的所有可选项
+
+
+## Bash 模式扩展
+
+### 简介
+
+用户输入命令后，Shell 首先会按照空格将命令拆分成若干个 token，然后对存在特殊字符的 token 进行**模式扩展**（globbing），最后才会执行相应的命令。
+
+Bash 提供了 8 种扩展：`~`、`?`、`*`、`[]`、`{}`、变量扩展、子命令扩展、算数扩展。
+
+模式扩展的执行者是 Bash，而不是命令。
+
+关闭模式扩展：
+
+```shell
+$ set -o noglob
+# or
+$ set -f
+```
+
+重新打开扩展：
+
+```shell
+$ set +o noglob
+# or
+$ set +f
+```
+
+### `~` 波浪线扩展
+
+- `~` 会自动扩展成用户主目录
+
+  ```shell
+  $ echo ~
+  /home/strangerxd
+  ```
+
+- `~/dir` 扩展为用户主目录下的 dir
+
+  ```shell
+  $ echo ~/dir
+  /home/strangerxd/dir
+  ```
+
+- `~user` 扩展成用户 `user` 的主目录
+
+  ```shell
+  $ echo ~root
+  /root
+  ```
+
+  若 `user` 用户不存在，则 `~` 不起作用
+
+  ```shell
+  $ echo ~wddxrw
+  ~wddxrw
+  ```
+
+- `~+` 扩展为当前目录，相当于 `pwd`
+
+  ```shell
+  $ echo ~+
+  /home/strangerxd
+  $ pwd
+  /home/strangerxd
+  ```
+
+### `?` 字符扩展
+
+- `?` 字符代表文件路径里面的任意单个字符，不包括空字符。
+- 如果 `?.txt` 可以扩展成文件名，echo 命令会输出扩展后的结果；如果不能扩展成文件名，echo 就会原样输出 `?.txt`。
+
+### `*` 字符扩展
+
+- `*` 字符代表文件路径里面的任意数量的任意字符，包括零个字符。
+- `*` 不会匹配隐藏文件（以 . 开头的文件）。
+- 如果要匹配隐藏文件，需要写成 `.*`。
+- 如果要匹配除 `.` 和 `..` 以外的隐藏文件 `.[!.]*`。
+- `*` 字符扩展属于文件名扩展，只有文件确实存在的前提下才会扩展。如果文件不存在，就会原样输出。
+- `**` 匹配零个或多个子目录。因此，`**/*.txt` 可以匹配顶层的文本文件和任意深度子目录的文本文件。
+
+### `[]` 方括号扩展
+
+- 方括号扩展的形式是 `[...]`，只有文件确实存在的前提下才会扩展。如果文件不存在，就会原样输出。
+- `[abc]` 匹配 `a b c` 中的任意一个字符。
+- `[^...]` 和 `[!...]` 表示匹配不在方括号里面的字符。
+- 如果需要匹配连字号 `-`，只能放在方括号内部的开头或结尾，比如 `[-aeiou]` 或` [aeiou-]`。
+
+### `[start-end]` 扩展
+
+- 方括号扩展有一个简写形式 `[start-end]`，表示匹配一个连续的范围。比如，`[a-c]` 等同于 `[abc]`，`[0-9]` 匹配 `[0123456789]`。
+- 常用示例：
+  - `[a-z]`：所有小写字母。
+  - `[a-zA-Z]`：所有小写字母与大写字母。
+  - `[a-zA-Z0-9]`：所有小写字母、大写字母与数字。
+  - `[abc]*`：所有以 a、b、c 字符之一开头的文件名。
+  - `program.[co]`：文件 program.c 与文件 program.o。
+  - `BACKUP.[0-9][0-9][0-9]`：所有以 BACKUP. 开头，后面是三个数字的文件名。
+- 否定形式 `[!start-end]`，表示匹配不属于这个范围的字符。
+
+### `{}` 大括号扩展
+
+- 大括号扩展 `{...}` 表示分别扩展成大括号里面的**所有值**，各个值之间使用逗号分隔。比如，`{1,2,3}` 扩展成 1 2 3。
+- 大括号扩展不是文件名扩展。它会扩展成所有给定的值，而不管是否有对应的文件存在。
+- 大括号内部的逗号前后不能有空格。
+- 逗号前面可以没有值，表示扩展的第一项为空。
+- 大括号可以嵌套。
+- 大括号也可以与其他模式联用，并且总是先于其他模式进行扩展。
+- 大括号可以用于多字符的模式，方括号不行（只能匹配单字符）。
+
+### `{start-end}` 扩展
+
+- 大括号扩展有一个简写形式 `{start..end}`，表示扩展成一个连续序列。比如，`{a..z}` 可以扩展成 26 个小写英文字母。
+- 支持逆序。
+- 如果遇到无法理解的简写，大括号模式就会原样输出，不会扩展。
+- 可以嵌套使用。
+- 如果整数前面有前导 `0`，扩展输出的每一项都有前导 `0`。
+    ```Bash
+    $ echo {01..5}
+    01 02 03 04 05
+
+    $ echo {001..5}
+    001 002 003 004 005
+    ```
+- 使用第二个双点号 {start..end..step}，用来指定扩展的步长。
+- 多个简写形式连用，会有循环处理的效果。
+    ```Bash
+    $ echo {a..c}{1..3}
+    a1 a2 a3 b1 b2 b3 c1 c2 c3
+    ```
+
+### 变量扩展
+
+- Bash 将美元符号 `$` 开头的词元视为变量，将其扩展成变量值。
+- 变量名除了放在美元符号后面，也可以放在 `${}` 里面。
+- `${!S*}` 扩展成所有以 `S` 开头的变量名。
+
+### 子命令扩展
+
+- `$(...)` 可以扩展成另一个命令的运行结果，该命令的所有输出都会作为返回值。
+    ```Bash
+    $ echo $(echo ${SHELL})
+    /usr/bin/zsh
+    $ echo $(SHELL)
+    SHELL: command not found
+    ```
+- 子命令放在反引号之中，也可以扩展成命令的运行结果。
+- 可以嵌套。
+
+### 算术扩展
+
+- `$((...))` 可以扩展成整数运算的结果。
+
+### 字符类
+
+- `[[:class:]]` 表示一个字符类，扩展成某一类特定字符之中的一个。常用的字符类如下。
+
+  - `[[:alnum:]]`：匹配任意英文字母与数字
+  - `[[:alpha:]]`：匹配任意英文字母
+  - `[[:blank:]]`：空格和 Tab 键。
+  - `[[:cntrl:]]`：ASCII 码 0-31 的不可打印字符。
+  - `[[:digit:]]`：匹配任意数字 0-9。
+  - `[[:graph:]]`：A-Z、a-z、0-9 和标点符号。
+  - `[[:lower:]]`：匹配任意小写字母 a-z。
+  - `[[:print:]]`：ASCII 码 32-127 的可打印字符。
+  - `[[:punct:]]`：标点符号（除了 A-Z、a-z、0-9 的可打印字符）。
+  - `[[:space:]]`：空格、Tab、LF（10）、VT（11）、FF（12）、CR（13）。
+  - `[[:upper:]]`：匹配任意大写字母 A-Z。
+  - `[[:xdigit:]]`：16 进制字符（A-F、a-f、0-9）。
+
+- 字符类的第一个方括号后面，可以加上感叹号!，表示否定。比如，[![:digit:]]匹配所有非数字。
+- 字符类也属于文件名扩展，如果没有匹配的文件名，字符类就会原样输出。
+
+### 注意
+
+- 通配符是先解释，再执行。
+- 文件名扩展在不匹配时，会原样输出。
+- 只适用于单层路径。
+- 文件名可以使用通配符。
+
+### 量词语法
+
+- 量词语法用来控制模式匹配的次数。它只有在 Bash 的 extglob 参数打开的情况下才能使用。
+    ```Bash
+    $ shopt extglob
+    extglob         on # 默认打开
+    ```
+    若关闭使用 `shopt -s extglob` 打开。
+- `?(pattern-list)`：匹配零个或一个模式。
+- `*(pattern-list)`：匹配零个或多个模式。
+- `+(pattern-list)`：匹配一个或多个模式。
+- `@(pattern-list)`：只匹配一个模式。
+- `!(pattern-list)`：匹配给定模式以外的任何内容。
+
+### shopt 命令
+
+- shopt 命令可以调整 Bash 的行为。
+    ```bash
+    # 打开某个参数
+    $ shopt -s [optionname]
+
+    # 关闭某个参数
+    $ shopt -u [optionname]
+
+    # 查询某个参数关闭还是打开
+    $ shopt [optionname]
+    ```
+- `dotglob` 参数可以让扩展结果包括隐藏文件（即点开头的文件）。默认关闭。
+- `nullglob` 参数可以让通配符不匹配任何文件名时，返回空字符。默认关闭。
+- `failglob` 参数使得通配符不匹配任何文件名时，Bash 会直接报错，而不是让各个命令去处理。默认关闭。
+- `extglob` 参数使得 Bash 支持 ksh 的一些扩展语法。默认打开。
+- `nocaseglob` 参数可以让通配符扩展不区分大小写。默认关闭。
+- `globstar` 参数可以使得 `**` 匹配零个或多个子目录。默认关闭。
+
+### 参考
+
+https://wangdoc.com/bash/expansion.html
+
 
 
 ## Bash 脚本入门
